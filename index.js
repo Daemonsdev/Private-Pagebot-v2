@@ -25,7 +25,7 @@ const setGetStartedButton = async () => {
     const url = `https://graph.facebook.com/v21.0/me/messenger_profile?access_token=${config.pageAccessToken}`;
     const requestBody = {
       get_started: {
-        payload: "GET_STARTED_PAYLOAD"
+        payload: "Hello there 🤗"
       }
     };
 
