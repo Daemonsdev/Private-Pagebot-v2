@@ -5,7 +5,7 @@ function handlePostback(event, pageAccessToken) {
   const payload = event.postback.payload;
 
   // Send a message back to the sender
-  sendMessage(senderId, { text: `You sent a postback with payload: ${payload}` }, pageAccessToken);
+  sendMessage(senderId, { text: `${payload}` }, pageAccessToken);
 }
 
 module.exports = { handlePostback };
