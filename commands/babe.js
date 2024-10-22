@@ -2,10 +2,10 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: 'ashley',
-  description: 'Get a response from Ashley API',
+  name: 'babe',
+  description: 'Talk to horny ai',
   role: 1,
-  author: 'churchill',
+  author: 'developer',
   async execute(senderId, args, pageAccessToken) {
     const chilli = args.join(' ');
 
@@ -20,7 +20,7 @@ module.exports = {
       const ashleyResponse = response.data.result || 'No response from Ashley.';
 
       const formattedResponse = 
-`𝗔𝗦𝗛𝗟𝗘𝗬 𝗔𝗜 🥵\n\n${ashleyResponse}`;
+`𝗛𝗢𝗥𝗡𝗬 𝗔𝗜 🥵\n\n${ashleyResponse}`;
 
       await sendMessage(senderId, { text: formattedResponse }, pageAccessToken);
 
