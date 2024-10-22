@@ -16,7 +16,7 @@ module.exports = {
       await sendResponseInChunks(senderId, text, pageAccessToken, sendMessage);
     } catch (error) {
       console.error('Error calling Heru AI API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      sendMessage(senderId, { text: '👋🏻 Hello how can I assist you today?\nNote: Dont use ai instead question directly thankyou!!\nSorry for an error!!' }, pageAccessToken);
     }
   }
 };
