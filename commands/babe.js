@@ -10,7 +10,7 @@ module.exports = {
     const chilli = args.join(' ');
 
     if (!chilli) {
-      return sendMessage(senderId, { text: 'Please provide a prompt, for example: ashley How are you?' }, pageAccessToken);
+      return sendMessage(senderId, { text: 'Please provide a prompt, for example: babe How are you?' }, pageAccessToken);
     }
 
     const apiUrl = `https://markdevs-last-api-t48o.onrender.com/api/ashley?query=${encodeURIComponent(chilli)}`;
