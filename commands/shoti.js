@@ -12,7 +12,7 @@ module.exports = {
       const { shotiurl: videoUrl, username, nickname, duration } = response.data;
 
       await sendMessage(senderId, {
-        text: `Username: ${username}\nNickname: ${nickname}\nDuration: ${duration} seconds`
+        text: `🌸 Username: ${username}\n💟 Nickname: ${nickname}\n⏳ Duration: ${duration} seconds`
       }, pageAccessToken);
 
       await sendMessage(senderId, {
