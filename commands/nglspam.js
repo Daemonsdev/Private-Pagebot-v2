@@ -5,7 +5,8 @@ module.exports = {
   description: "Send a message using user",
   author: "Kim Joseph DG Bien",
   role: 1,
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+
+  async execute(senderId, args, pageAccessToken) {
     const nglusername = args[0];
     const message = args.slice(1, -1).join(' ');
     const amount = args[args.length - 1]; 
@@ -30,9 +31,7 @@ module.exports = {
 
       let value = 0;
       for (let i = 0; i < amount; i++) {
-        await axios.post('https://ngl.link/api/submit', data, {
-          headers,
-        });
+        await axios.post('https://ngl.link/api/submit', data, { headers });
         value += 1;
         console.log(`[+] Send => ${value}`);
       }
@@ -44,3 +43,4 @@ module.exports = {
     }
   }
 };
+                         
