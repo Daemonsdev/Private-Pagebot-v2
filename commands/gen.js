@@ -2,7 +2,7 @@ const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
-  name: 'art',
+  name: 'gen',
   description: 'Generate an image based on a prompt using the JoshWeb API.',
   role: 1,
   author: 'Jay Mar',
@@ -10,7 +10,7 @@ module.exports = {
   async execute(senderId, args, pageAccessToken) {
     if (!args || args.length === 0) {
       await sendMessage(senderId, {
-        text: 'Please provide a prompt.\n\nUsage:\nExample: art cat fyling'
+        text: 'Please provide a prompt.\n\nUsage:\nExample: gen cat'
       }, pageAccessToken);
       return;
     }
