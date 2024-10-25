@@ -6,7 +6,7 @@ module.exports = {
   role: 1,
   author: "developer",
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const searchQuery = args.join(" ");
 
     if (!searchQuery) {
@@ -41,9 +41,10 @@ module.exports = {
 
     } catch (error) {
       console.error("Error retrieving the Spotify track:", error);
-      sendMessage(senderId, {
+      await sendMessage(senderId, {
         text: `Error retrieving the Spotify track. Please try again or check your input.`
       }, pageAccessToken);
     }
   }
 };
+    
