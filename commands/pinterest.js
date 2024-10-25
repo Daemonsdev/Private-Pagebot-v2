@@ -1,13 +1,19 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'pinterest',
   description: 'Fetch images from Pinterest based on a query',
-  author: 'Deku',
+  author: 'Jay Mar',
   role: 1,
 
   async execute(senderId, args, pageAccessToken) {
-    const query = args.join(' ');
+    const query = args.join(' ').trim();
+
+    if (!query) {
+      await sendMessage(senderId, { text: 'Please provide a search query for Pinterest images.' }, pageAccessToken);
+      return;
+    }
 
     try {
       const apiUrl = `https://joshweb.click/api/pinterest?q=${encodeURIComponent(query)}`;
@@ -37,4 +43,4 @@ module.exports = {
     }
   }
 };
-                    
+          
