@@ -5,7 +5,8 @@ module.exports = {
   description: 'Fetch images from Pinterest based on a query',
   author: 'Deku',
   role: 1,
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+
+  async execute(senderId, args, pageAccessToken) {
     const query = args.join(' ');
 
     try {
@@ -36,3 +37,4 @@ module.exports = {
     }
   }
 };
+                    
