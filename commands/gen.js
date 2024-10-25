@@ -3,7 +3,7 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'gen',
-  description: 'Generate an image based on a prompt using the JoshWeb API.',
+  description: 'Generate an image based on a prompt.',
   role: 1,
   author: 'Jay Mar',
   
