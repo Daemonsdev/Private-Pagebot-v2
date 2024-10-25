@@ -7,31 +7,34 @@ module.exports = {
   role: 1,
   author: 'Jay Mar',
   
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const prompt = args.join(' ').trim();
+    
     if (!prompt) {
-      sendMessage(senderId, { text: '🌟 Hello there! I m you virtual assistant, how can i assist you today?.' }, pageAccessToken);
-      return;
+      return sendMessage(senderId, { text: '🌟 Hello there! I m your virtual assistant, how can I assist you today?' }, pageAccessToken);
     }
 
-    try {
-      const apiUrl = `https://rest-api-production-5054.up.railway.app/gpt4om?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
-      const response = await axios.get(apiUrl);
+    const apiUrl = `https://rest-api-production-5054.up.railway.app/gpt4om?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
 
+    try {
+      const response = await axios.get(apiUrl);
       const text = response.data.message || 'Sorry, no valid response was received from GPT-4 API.';
       const maxMessageLength = 2000;
 
-      if (text.length > maxMessageLength) {
-        const messages = splitMessageIntoChunks(text, maxMessageLength);
+      const formattedResponse = 
+`🌟 𝗚𝗣𝗧-𝗠𝗢𝗗𝗘𝗟\n\n${text}`;
+
+      if (formattedResponse.length > maxMessageLength) {
+        const messages = splitMessageIntoChunks(formattedResponse, maxMessageLength);
         for (const message of messages) {
-          sendMessage(senderId, { text: message }, pageAccessToken);
+          await sendMessage(senderId, { text: message }, pageAccessToken);
         }
       } else {
-        sendMessage(senderId, { text }, pageAccessToken);
+        await sendMessage(senderId, { text: formattedResponse }, pageAccessToken);
       }
     } catch (error) {
       console.error('Error calling GPT-4 API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
     }
   }
 };
@@ -42,5 +45,4 @@ function splitMessageIntoChunks(message, chunkSize) {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-          }
-  
+}
