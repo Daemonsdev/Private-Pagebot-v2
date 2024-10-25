@@ -1,8 +1,8 @@
 const fs = require('fs');
 const axios = require('axios');
-const path = require('path')
+const path = require('path');
+const { sendMessage } = require('../handles/sendMessage');
 
-//const petDataPath = './petData.json';
 const petDataPath = path.join(__dirname, 'data', 'petData.json');
 
 let petData = {}; 
@@ -38,7 +38,6 @@ function decreaseHunger() {
       if (petData[ownerId].hunger < 0) petData[ownerId].hunger = 0;
       if (petData[ownerId].hunger <= 10) petData[ownerId].isSick = true; // Pet becomes sick if hunger is 10 or below
       if (petData[ownerId].hunger === 0) {
-        // Pet dies if hunger reaches 0
         sendMessage(ownerId, { text: `💀 Oh no! ${petData[ownerId].name} has died of hunger.` }, petData[ownerId].pageAccessToken);
         delete petData[ownerId]; // Remove the pet data
         continue; // Move to the next pet
@@ -60,7 +59,7 @@ function checkSleep() {
 }
 
 // Function to send messages in chunks
-async function sendResponseInChunks(senderId, text, pageAccessToken, sendMessage) {
+async function sendResponseInChunks(senderId, text, pageAccessToken) {
   const maxMessageLength = 2000;
   if (text.length > maxMessageLength) {
     const messages = splitMessageIntoChunks(text, maxMessageLength);
@@ -128,7 +127,8 @@ module.exports = {
   description: 'Interact with your virtual pet',
   author: 'Adrian',
   role: 1,
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  
+  async execute(senderId, args, pageAccessToken) {
     loadPetData();
 
     const action = args[0] ? args[0].toLowerCase() : '';
@@ -186,7 +186,7 @@ module.exports = {
           const hungerBar = generateStatusBar('Hunger', petData[senderId].hunger);
           const energyBar = generateStatusBar('Energy', petData[senderId].energy);
           const statusMessage = `${petName}'s status:\n\n${hungerBar}\n${energyBar}`;
-          sendResponseInChunks(senderId, statusMessage, pageAccessToken, sendMessage);
+          sendResponseInChunks(senderId, statusMessage, pageAccessToken);
           break;
 
         case 'play':
@@ -244,3 +244,4 @@ module.exports = {
     setInterval(checkSleep, sleepCheckInterval);
   }
 };
+          
