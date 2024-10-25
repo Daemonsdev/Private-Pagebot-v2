@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'gpt4o',
@@ -6,46 +7,47 @@ module.exports = {
   role: 1,
   author: 'Jay',
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const prompt = args.join(' ');
+    
     if (!prompt) {
-      sendMessage(senderId, { text: '🌟 Hello, I\'m GPT-4o, How may I assist you today?' }, pageAccessToken);
-      return;
+      return sendMessage(senderId, { text: '🌟 Hello, I\'m GPT-4o, How may I assist you today?' }, pageAccessToken);
     }
 
-    try {
-      const apiUrl = `https://rest-api-production-5054.up.railway.app/ai?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
-      const response = await axios.get(apiUrl);
+    const apiUrl = `https://rest-api-production-5054.up.railway.app/ai?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
 
+    try {
+      const response = await axios.get(apiUrl);
       const text = response.data.message || 'No response received from GPT-4o. Please try again later.';
       const attachments = response.data.attachments || [];
 
-      sendMessage(senderId, { text }, pageAccessToken);
+      await sendMessage(senderId, { text }, pageAccessToken);
 
       if (attachments.length > 0) {
         const attachmentMessages = attachments.map(att => {
           if (att.type === 'image') {
             return {
               attachment: {
-                type: 'image', // Use the image type for Messenger
+                type: 'image',
                 payload: {
-                  url: att.url, // Send the image URL directly
-                  is_reusable: true // Optionally mark as reusable to avoid re-uploading the same image
+                  url: att.url,
+                  is_reusable: true
                 }
               }
             };
           }
           return null; // Handle other attachment types if needed
-        }).filter(msg => msg !== null); // Filter out null values
+        }).filter(msg => msg !== null);
 
         for (let attachmentMessage of attachmentMessages) {
-          sendMessage(senderId, attachmentMessage, pageAccessToken);
+          await sendMessage(senderId, attachmentMessage, pageAccessToken);
         }
       }
 
     } catch (error) {
       console.error('Error calling GPT-4 API with attachments:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
     }
   }
 };
+                                                   
