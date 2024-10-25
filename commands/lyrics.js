@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage'); // Ensure the path is correct
 
 module.exports = {
   name: 'lyrics',
@@ -42,6 +43,7 @@ module.exports = {
   }
 };
 
+// Function to send messages in chunks
 async function sendResponseInChunks(senderId, text, pageAccessToken) {
   const maxMessageLength = 2000;
   if (text.length > maxMessageLength) {
@@ -54,6 +56,7 @@ async function sendResponseInChunks(senderId, text, pageAccessToken) {
   }
 }
 
+// Function to split a message into chunks
 function splitMessageIntoChunks(message, chunkSize) {
   const chunks = [];
   let chunk = '';
@@ -72,5 +75,4 @@ function splitMessageIntoChunks(message, chunkSize) {
   }
 
   return chunks;
-        }
-            
+}
