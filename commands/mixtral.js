@@ -1,38 +1,39 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'mixtral',
-  description: 'Ask a question to the Mixtral Ai',
-  author: 'Jay Mar',
+  description: 'Ask a question to the Mixtral AI',
   role: 1,
+  author: 'Jay Mar',
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const query = args.join(' ').trim();
     
     if (!query) {
-      sendMessage(senderId, { text: 'Hello I\'m Mixtral AI, how can I assist you today??' }, pageAccessToken);
-      return;
+      return sendMessage(senderId, { text: 'Hello I\'m Mixtral AI, how can I assist you today?' }, pageAccessToken);
     }
 
-    try {
-      const apiUrl = `https://joshweb.click/api/mixtral-8b?q=${encodeURIComponent(query)}`;
-      const response = await axios.get(apiUrl);
+    const apiUrl = `https://joshweb.click/api/mixtral-8b?q=${encodeURIComponent(query)}`;
 
+    try {
+      const response = await axios.get(apiUrl);
       const { status, result } = response.data;
 
       if (status) {
-        await sendResponseInChunks(senderId, result, pageAccessToken, sendMessage);
+        const formattedResponse = `🤖 𝗠𝗜𝗫𝗧𝗥𝗔𝗟 𝗔𝗜\n\n${result}`;
+        await sendResponseInChunks(senderId, formattedResponse, pageAccessToken);
       } else {
-        sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+        await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
       }
     } catch (error) {
       console.error('Error calling Mixtral API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
     }
   }
 };
 
-async function sendResponseInChunks(senderId, text, pageAccessToken, sendMessage) {
+async function sendResponseInChunks(senderId, text, pageAccessToken) {
   const maxMessageLength = 2000;
 
   if (text.length > maxMessageLength) {
