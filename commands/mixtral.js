@@ -5,15 +5,22 @@ module.exports = {
   description: 'Ask a question to the Mixtral API',
   author: 'Deku (rest api)',
   role: 1,
+
   async execute(senderId, args, pageAccessToken, sendMessage) {
-    const query = args.join(' ');
+    const query = args.join(' ').trim();
+    
+    if (!query) {
+      sendMessage(senderId, { text: 'Hello I\'m Mixtral AI, how can I assist you today??' }, pageAccessToken);
+      return;
+    }
+
     try {
       const apiUrl = `https://joshweb.click/api/mixtral-8b?q=${encodeURIComponent(query)}`;
       const response = await axios.get(apiUrl);
+
       const { status, result } = response.data;
 
       if (status) {
-        // Send the response, split into chunks if necessary
         await sendResponseInChunks(senderId, result, pageAccessToken, sendMessage);
       } else {
         sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
@@ -27,6 +34,7 @@ module.exports = {
 
 async function sendResponseInChunks(senderId, text, pageAccessToken, sendMessage) {
   const maxMessageLength = 2000;
+
   if (text.length > maxMessageLength) {
     const messages = splitMessageIntoChunks(text, maxMessageLength);
     for (const message of messages) {
@@ -49,7 +57,7 @@ function splitMessageIntoChunks(message, chunkSize) {
     }
     chunk += `${word} `;
   }
-  
+
   if (chunk) {
     chunks.push(chunk.trim());
   }
