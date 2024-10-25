@@ -1,17 +1,18 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: "ngl",
   description: "Send a message using user",
-  author: "Kim Joseph DG Bien",
+  author: "Jay Mar",
   role: 1,
 
   async execute(senderId, args, pageAccessToken) {
     const nglusername = args[0];
     const message = args.slice(1, -1).join(' ');
-    const amount = args[args.length - 1]; 
+    const amount = parseInt(args[args.length - 1], 10); 
 
-    if (!nglusername || !message || !amount) {
+    if (!nglusername || !message || isNaN(amount)) {
       return sendMessage(senderId, { text: "Invalid command format. Please use ngl [username] [message] [amount]" }, pageAccessToken);
     }
 
@@ -29,18 +30,16 @@ module.exports = {
         'referrer': '',
       };
 
-      let value = 0;
       for (let i = 0; i < amount; i++) {
         await axios.post('https://ngl.link/api/submit', data, { headers });
-        value += 1;
-        console.log(`[+] Send => ${value}`);
+        console.log(`[+] Sent message ${i + 1} to ${nglusername}`);
       }
 
       await sendMessage(senderId, { text: `Successfully sent ${amount} message(s) to ${nglusername} through ngl.link.` }, pageAccessToken);
     } catch (error) {
-      console.log(error);
+      console.error('Error sending message through ngl.link:', error);
       await sendMessage(senderId, { text: "An error occurred while sending the message through ngl.link." }, pageAccessToken);
     }
   }
 };
-                         
+        
