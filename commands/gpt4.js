@@ -2,15 +2,21 @@ const axios = require('axios');
 
 module.exports = {
   name: 'gpt4',
-  description: 'Ask a question to GPT-4',
-  author: 'Deku (rest api)',
+  description: 'Ask a question to GPT-4 Model',
   role: 1,
+  author: 'Jay Mar',
+
   async execute(senderId, args, pageAccessToken, sendMessage) {
-    const prompt = args.join(' ');
+    const prompt = args.join(' ').trim();
+    if (!prompt) {
+      sendMessage(senderId, { text: '🌟 Please provide a prompt.' }, pageAccessToken);
+      return;
+    }
+
     try {
       const apiUrl = `https://joshweb.click/gpt4?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
       const response = await axios.get(apiUrl);
-      const text = response.data.gpt4;
+      const text = response.data.gpt4 || 'No response received from GPT-4. Please try again later.';
 
       // Send the response, split into chunks if necessary
       await sendResponseInChunks(senderId, text, pageAccessToken, sendMessage);
@@ -51,4 +57,4 @@ function splitMessageIntoChunks(message, chunkSize) {
   }
 
   return chunks;
-}
+                }
