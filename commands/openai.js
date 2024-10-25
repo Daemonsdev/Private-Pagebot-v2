@@ -7,31 +7,33 @@ module.exports = {
   role: 1,
   author: 'Jay Mar',
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const prompt = args.join(' ').trim();
+    
     if (!prompt) {
-      sendMessage(senderId, { text: '🤖 Hey there! I’m OpenAI, how can I assist you today?' }, pageAccessToken);
-      return;
+      return sendMessage(senderId, { text: '🤖 Hey there! I’m OpenAI, how can I assist you today?' }, pageAccessToken);
     }
 
-    try {
-      const apiUrl = `https://tools.betabotz.eu.org/tools/openai?q=${encodeURIComponent(prompt)}`;
-      const response = await axios.get(apiUrl);
+    const apiUrl = `https://tools.betabotz.eu.org/tools/openai?q=${encodeURIComponent(prompt)}`;
 
+    try {
+      const response = await axios.get(apiUrl);
       const text = response.data.result || 'No response received from OpenAI. Please try again later.';
       const maxMessageLength = 2000;
 
-      if (text.length > maxMessageLength) {
-        const messages = splitMessageIntoChunks(text, maxMessageLength);
+      const formattedResponse = `🤖 𝗢𝗽𝗲𝗻𝗔𝗜 𝗔𝘀𝘀𝗶𝘀𝘁𝗮𝗻𝘁\n\n${text}`;
+
+      if (formattedResponse.length > maxMessageLength) {
+        const messages = splitMessageIntoChunks(formattedResponse, maxMessageLength);
         for (const message of messages) {
-          sendMessage(senderId, { text: message }, pageAccessToken);
+          await sendMessage(senderId, { text: message }, pageAccessToken);
         }
       } else {
-        sendMessage(senderId, { text }, pageAccessToken);
+        await sendMessage(senderId, { text: formattedResponse }, pageAccessToken);
       }
     } catch (error) {
       console.error('Error calling OpenAI API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
     }
   }
 };
@@ -42,4 +44,4 @@ function splitMessageIntoChunks(message, chunkSize) {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-        }
+}
