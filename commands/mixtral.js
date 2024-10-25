@@ -2,8 +2,8 @@ const axios = require('axios');
 
 module.exports = {
   name: 'mixtral',
-  description: 'Ask a question to the Mixtral API',
-  author: 'Deku (rest api)',
+  description: 'Ask a question to the Mixtral Ai',
+  author: 'Jay Mar',
   role: 1,
 
   async execute(senderId, args, pageAccessToken, sendMessage) {
