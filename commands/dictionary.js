@@ -5,6 +5,7 @@ module.exports = {
   description: 'Search words dictionary',
   author: 'Developer',
   role: 1,
+
   async execute(senderId, args, pageAccessToken, sendMessage) {
     const input = args.join(' ');
 
@@ -35,3 +36,4 @@ module.exports = {
     }
   }
 };
+      
