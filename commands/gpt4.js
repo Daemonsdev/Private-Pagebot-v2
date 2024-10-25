@@ -1,60 +1,53 @@
 const axios = require('axios');
+const { sendMessage } = require('../handles/sendMessage');
+const MAX_MESSAGE_LENGTH = 2000;
+const DELAY_BETWEEN_MESSAGES = 1000; // 1 second
 
-module.exports = {
-  name: 'gpt4',
-  description: 'Ask a question to GPT-4 Model',
-  role: 1,
-  author: 'Jay Mar',
+// Function to send long messages by splitting into chunks
+function sendLongMessage(senderId, text, pageAccessToken, sendMessage) {
+  if (text.length > MAX_MESSAGE_LENGTH) {
+    const messages = splitMessageIntoChunks(text, MAX_MESSAGE_LENGTH);
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
-    const prompt = args.join(' ').trim();
-    if (!prompt) {
-      sendMessage(senderId, { text: '🌟 Please provide a prompt.' }, pageAccessToken);
-      return;
-    }
+    sendMessage(senderId, { text: messages[0] }, pageAccessToken);
 
-    try {
-      const apiUrl = `https://joshweb.click/gpt4?prompt=${encodeURIComponent(prompt)}&uid=${senderId}`;
-      const response = await axios.get(apiUrl);
-      const text = response.data.gpt4 || 'No response received from GPT-4. Please try again later.';
-
-      // Send the response, split into chunks if necessary
-      await sendResponseInChunks(senderId, text, pageAccessToken, sendMessage);
-    } catch (error) {
-      console.error('Error calling GPT-4 API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
-    }
-  }
-};
-
-async function sendResponseInChunks(senderId, text, pageAccessToken, sendMessage) {
-  const maxMessageLength = 2000;
-  if (text.length > maxMessageLength) {
-    const messages = splitMessageIntoChunks(text, maxMessageLength);
-    for (const message of messages) {
-      await sendMessage(senderId, { text: message }, pageAccessToken);
-    }
+    messages.slice(1).forEach((message, index) => {
+      setTimeout(() => sendMessage(senderId, { text: message }, pageAccessToken), (index + 1) * DELAY_BETWEEN_MESSAGES);
+    });
   } else {
-    await sendMessage(senderId, { text }, pageAccessToken);
+    sendMessage(senderId, { text }, pageAccessToken);
   }
 }
 
+// Splits a message into chunks of the specified size
 function splitMessageIntoChunks(message, chunkSize) {
-  const chunks = [];
-  let chunk = '';
-  const words = message.split(' ');
+  const regex = new RegExp(`.{1,${chunkSize}}`, 'g');
+  return message.match(regex);
+}
 
-  for (const word of words) {
-    if ((chunk + word).length > chunkSize) {
-      chunks.push(chunk.trim());
-      chunk = '';
+module.exports = {
+  name: 'gpt4',
+  description: 'Ask GPT-4 for a response to a given query',
+  usage: '-gpt4 <query>',
+  author: 'coffee',
+  async execute(senderId, args, pageAccessToken) {
+    if (!args || !Array.isArray(args) || args.length === 0) {
+      await sendMessage(senderId, { text: 'Please provide a query.' }, pageAccessToken);
+      return;
     }
-    chunk += `${word} `;
-  }
-  
-  if (chunk) {
-    chunks.push(chunk.trim());
-  }
 
-  return chunks;
-                }
+    const query = args.join(' ');
+
+    try {
+      const apiUrl = `https://markdevs-last-api-2epw.onrender.com/api/v2/gpt4?query=${encodeURIComponent(query)}`;
+      const response = await axios.get(apiUrl);
+      const gptResponse = response.data.respond;
+
+      // Send the GPT-4 response, handling long messages
+      sendLongMessage(senderId, gptResponse, pageAccessToken, sendMessage);
+
+    } catch (error) {
+      console.error('Error:', error);
+      await sendMessage(senderId, { text: 'Error: Could not get a response from GPT-4.' }, pageAccessToken);
+    }
+  }
+};
