@@ -4,36 +4,36 @@ const { sendMessage } = require('../handles/sendMessage');
 module.exports = {
   name: 'gpt3',
   description: 'Ask a question to the GPT-3.5',
-  author: 'Jay Mar',
   role: 1,
+  author: 'Jay Mar',
 
-  async execute(senderId, args, pageAccessToken, sendMessage) {
+  async execute(senderId, args, pageAccessToken) {
     const prompt = args.join(' ').trim();
     
     if (!prompt) {
-      sendMessage(senderId, { text: '🌟 Hello there! I\'m GPT-3.5 Turbo, how can I assist you today?' }, pageAccessToken);
-      return;
+      return sendMessage(senderId, { text: '🌟 Hello there! I\'m GPT-3.5 Turbo, how can I assist you today?' }, pageAccessToken);
     }
 
-    try {
-      const apiUrl = `https://joshweb.click/new/gpt-3_5-turbo?prompt=${encodeURIComponent(prompt)}`;
-      const response = await axios.get(apiUrl);
+    const apiUrl = `https://joshweb.click/new/gpt-3_5-turbo?prompt=${encodeURIComponent(prompt)}`;
 
+    try {
+      const response = await axios.get(apiUrl);
       const { result } = response.data;
 
       if (result) {
-        await sendResponseInChunks(senderId, result, pageAccessToken, sendMessage);
+        const formattedResponse = `🌟 𝗚𝗣𝗧-𝟑.𝟓 𝗥𝗘𝗦𝗣𝗢𝗡𝗦𝗘\n\n${result}`;
+        await sendResponseInChunks(senderId, formattedResponse, pageAccessToken);
       } else {
-        sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+        await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
       }
     } catch (error) {
       console.error('Error calling GPT-3.5 Turbo API:', error);
-      sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
+      await sendMessage(senderId, { text: 'Sorry, there was an error processing your request.' }, pageAccessToken);
     }
   }
 };
 
-async function sendResponseInChunks(senderId, text, pageAccessToken, sendMessage) {
+async function sendResponseInChunks(senderId, text, pageAccessToken) {
   const maxMessageLength = 2000;
 
   if (text.length > maxMessageLength) {
@@ -64,5 +64,5 @@ function splitMessageIntoChunks(message, chunkSize) {
   }
 
   return chunks;
-  }
-  
+                          }
+                        
