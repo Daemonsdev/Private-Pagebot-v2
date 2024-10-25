@@ -55,4 +55,4 @@ function sendMessage(senderId, message, pageAccessToken) {
   });
 }
 
-module.exports = { sendMessage, typingIndicator };
+module.exports = { sendMessage };
